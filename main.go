@@ -109,7 +109,7 @@ func main() {
 	mt, _ := merkletree.NewMerkleTree(ctx, store, 32)
 
 	for index, value := range chunkNames {
-		mt.Add(ctx, big.NewInt(int64(index)), big.NewInt(0)) // You might need to adjust the second parameter based on your use case
+		mt.Add(ctx, big.NewInt(int64(index)), big.NewInt(0)) 
 		fmt.Println(ctx, index, value)
 
 		// Proof of membership for each chunk
@@ -123,7 +123,7 @@ func main() {
 		}
 	}
 
-	// Proof of non-membership for a non-existing chunk (e.g., index 100)
+	// Proof of non-membership for a non-existing chunk
 	nonExistingIndex := big.NewInt(100)
 	proofNotExist, _, _ := mt.GenerateProof(ctx, nonExistingIndex, mt.Root())
 	fmt.Printf("Proof of non-membership for chunk %d: %v\n", nonExistingIndex.Int64(), proofNotExist.Existence)
