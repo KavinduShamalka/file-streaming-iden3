@@ -7,8 +7,9 @@ import (
 	"os"
 )
 
-// Retrieve
+// Retrieve Chunks and Verify.
 func RetrieveChunksAndVerify(chunkNames []string, hashValues []string, outputFileName string) error {
+
 	outputFile, err := os.Create(outputFileName)
 	if err != nil {
 		return err
