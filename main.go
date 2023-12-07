@@ -41,9 +41,18 @@ func SplitFile(inputFile *os.File, chunkSize int64) ([]string, []string, error) 
 		}
 
 		chunkFile.Close()
-		chunkNames = append(chunkNames, chunkFile.Name())
 
+		// Calculate hash value
 		hashValue := fmt.Sprintf("%x", hasher.Sum(nil))
+		hashedFileName := fmt.Sprintf("%s", hashValue)
+
+		// Rename the chunk file with its hash value
+		err = os.Rename(chunkFile.Name(), hashedFileName)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		chunkNames = append(chunkNames, hashedFileName)
 		hashValues = append(hashValues, hashValue)
 
 		hasher.Reset()
@@ -109,8 +118,10 @@ func main() {
 	mt, _ := merkletree.NewMerkleTree(ctx, store, 32)
 
 	for index, value := range chunkNames {
-		mt.Add(ctx, big.NewInt(int64(index)), big.NewInt(0)) 
+		mt.Add(ctx, big.NewInt(int64(index)), big.NewInt(0)) // Need to adjust the second parameter based on our use case need
 		fmt.Println(ctx, index, value)
+
+		fmt.Println(mt.Root())
 
 		// Proof of membership for each chunk
 		proofExist, _, _ := mt.GenerateProof(ctx, big.NewInt(int64(index)), mt.Root())
@@ -123,7 +134,7 @@ func main() {
 		}
 	}
 
-	// Proof of non-membership for a non-existing chunk
+	// Proof of non-membership for a non-existing chunk (e.g., index 100)
 	nonExistingIndex := big.NewInt(100)
 	proofNotExist, _, _ := mt.GenerateProof(ctx, nonExistingIndex, mt.Root())
 	fmt.Printf("Proof of non-membership for chunk %d: %v\n", nonExistingIndex.Int64(), proofNotExist.Existence)
