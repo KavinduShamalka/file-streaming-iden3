@@ -69,8 +69,8 @@ func main() {
 	}
 
 	// Proof of non-membership for a non-existing chunk (e.g., index 100)
-	nonExistingIndex := big.NewInt(100)
-	proofNotExist, _, _ := mt.GenerateProof(ctx, nonExistingIndex, mt.Root())
+	nonExistingIndex := big.NewInt(100)                                       // Intialize none existing index
+	proofNotExist, _, _ := mt.GenerateProof(ctx, nonExistingIndex, mt.Root()) //Generate the proof
 	fmt.Printf("Proof of non-membership for chunk %d: %v\n", nonExistingIndex.Int64(), proofNotExist.Existence)
 
 	claimToMarshal, _ := json.Marshal(mt.Root())
@@ -80,6 +80,8 @@ func main() {
 
 // Check the chunk's proof of existence
 func checkProof(proofExist *merkletree.Proof, chunkNames []string, hashValues []string, outputFileName string) error {
+
+	// check if proofExist true
 	if proofExist.Existence {
 		// RetrieveChunksfunctions
 		return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
