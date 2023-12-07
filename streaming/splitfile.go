@@ -8,7 +8,7 @@ import (
 )
 
 // SplitFile splits a file into chunks of a specified size
-func SplitFile(inputFile *os.File, chunkSize int64) ([]int64, error) {
+func SplitFile(inputFile *os.File, chunkSize int64) ([]string, []string, error) {
 
 	// // Open the input file
 	// file, err := os.Open(inputFile)
@@ -23,14 +23,14 @@ func SplitFile(inputFile *os.File, chunkSize int64) ([]int64, error) {
 	// Get file info
 	fileInfo, err := inputFile.Stat()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	fileSize := fileInfo.Size()
 
-	// chunkNames := make([]string, 0)
-	chunkSizes := make([]int64, 0)
-	// hashValues := make([]string, 0)
+	chunkNames := make([]string, 0)
+	// chunkSizes := make([]int64, 0)
+	hashValues := make([]string, 0)
 
 	hasher := sha256.New()
 
@@ -39,7 +39,7 @@ func SplitFile(inputFile *os.File, chunkSize int64) ([]int64, error) {
 
 		chunkFile, err := os.Create(chunkName)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		// Create a multi-writer to both write to the file and calculate the hash
@@ -48,29 +48,29 @@ func SplitFile(inputFile *os.File, chunkSize int64) ([]int64, error) {
 		// Copy the chunkSize bytes from the original file to the chunk file
 		_, err = io.CopyN(multiWriter, inputFile, chunkSize)
 		if err != nil && err != io.EOF {
-			return nil, err
+			return nil, nil, err
 		}
 
 		chunkFile.Close()
-		// chunkNames = append(chunkNames, chunkName)
-		chunkSizes = append(chunkSizes, chunkSize)
+		chunkNames = append(chunkNames, chunkName)
+		// chunkSizes = append(chunkSizes, chunkSize)
 
 		// Add the hash value of the chunk to the slice
 		hashValue := fmt.Sprintf("%x", hasher.Sum(nil))
 
-		// hashValues = append(hashValues, hashValue)
+		hashValues = append(hashValues, hashValue)
 		newChunkName := hashValue
 		err = os.Rename(chunkName, newChunkName)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		// chunkNames = append(chunkNames, newChunkName)
-		// hashValues = append(hashValues, hashValue)
+		hashValues = append(hashValues, hashValue)
 		// Reset the hash for the next iteration
 		hasher.Reset()
 
 	}
 
-	return chunkSizes, nil
+	return chunkNames, hashValues, nil
 }

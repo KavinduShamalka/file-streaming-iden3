@@ -7,6 +7,7 @@ import (
 	"iden3-test/streaming"
 	"math/big"
 	"os"
+	"strconv"
 
 	merkletree "github.com/iden3/go-merkletree-sql"
 	"github.com/iden3/go-merkletree-sql/db/memory"
@@ -21,7 +22,7 @@ func main() {
 	chunkSize := int64(256000) // Set your desired chunk size in bytes
 
 	// Split the file into chunks
-	chunk, err := streaming.SplitFile(inputFile, chunkSize)
+	chunk, hasher, err := streaming.SplitFile(inputFile, chunkSize)
 	if err != nil {
 		fmt.Println("Error splitting file:", err)
 		return
@@ -36,36 +37,43 @@ func main() {
 	// Generate a new MerkleTree with 32 levels
 	mt, _ := merkletree.NewMerkleTree(ctx, store, 32)
 
-	// Add a leaf to the tree with index 1 and chunk[0]
-	// index1 := big.NewInt(1)
-	// value1 := big.NewInt(chunk[0])
-	// mt.Add(ctx, index1, value1)
+	// add chunks to merkle tree
+	for index, value := range chunk {
 
-	// // Add another leaf to the tree
-	// index2 := big.NewInt(2)
-	// value2 := big.NewInt(chunk[1])
-	// mt.Add(ctx, index2, value2)
+		// Convert string to int64
+		int64Value, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			// Handle error if conversion fails
+			fmt.Println("Conversion error:", err)
+			return
+		}
 
-	for i, val := range chunk {
-		mt.Add(ctx, big.NewInt(int64(i)), big.NewInt(val))
+		mt.Add(ctx, big.NewInt(int64(index)), big.NewInt(int64Value))
+
+		// Proof of membership of a leaf with index
+		proofExist, _, _ := mt.GenerateProof(ctx, big.NewInt(int64(index)), mt.Root())
+		fmt.Printf("Proof of membership %v: %v\n", index, proofExist.Existence)
+
+		err = newFunction(proofExist, chunk, hasher, "restored_data.jpg")
+		if err != nil {
+			fmt.Println("Error retrieving and verifying chunks:", err)
+			return
+		}
+
 	}
 
-	// Proof of membership of a leaf with index 1
-	proofExist, value, _ := mt.GenerateProof(ctx, big.NewInt(0), mt.Root())
-
-	fmt.Println("Proof of membership 1:", proofExist.Existence)
-	fmt.Println("Value corresponding to the queried index:", value)
-
-	// Proof of non-membership of a leaf with index 4
-	proofNotExist, _, _ := mt.GenerateProof(ctx, big.NewInt(6), mt.Root())
-
-	fmt.Println("Proof of membership 4:", proofNotExist.Existence)
-
-	fmt.Printf("%v\n", mt)
+	fmt.Printf("Root tree address: %v\n", mt)
 
 	// transform root from bytes array to json
-	claimToMarshal, _ := json.Marshal(mt.Root())
+	root, _ := json.Marshal(mt.Root().BigInt())
 
-	fmt.Println(string(claimToMarshal))
+	fmt.Println(string(root))
 
+}
+
+func newFunction(proofExist *merkletree.Proof, chunkNames []string, hashValues []string, outputFileName string) error {
+	if proofExist.Existence {
+		return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
+	}
+	return fmt.Errorf("proof of non-membership received")
 }
