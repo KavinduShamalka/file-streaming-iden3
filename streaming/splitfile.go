@@ -59,6 +59,7 @@ func SplitFile(inputFile *os.File, chunkSize int64) ([]string, []string, error) 
 		chunkNames = append(chunkNames, hashedFileName)
 		hashValues = append(hashValues, hashValue)
 
+		// chunkNames[0] = "ggggggg"
 		hasher.Reset()
 	}
 

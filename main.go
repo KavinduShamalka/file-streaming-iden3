@@ -54,7 +54,7 @@ func main() {
 		fmt.Println()
 		fmt.Println(ctx, index, value)
 
-		fmt.Println(mt.Root())
+		// fmt.Println(mt.Root())
 
 		// Proof of membership for each chunk
 		proofExist, _, _ := mt.GenerateProof(ctx, big.NewInt(int64(index)), mt.Root())
