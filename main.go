@@ -14,8 +14,8 @@ import (
 
 func main() {
 
-	// Define chuksize
-	chunkSize := int64(500000)
+	// Define chuksize 256kb in bytes
+	chunkSize := int64(256000)
 
 	// Read the input file
 	inputFile, err := os.Open("test.png")

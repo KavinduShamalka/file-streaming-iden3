@@ -45,6 +45,8 @@ func RetrieveChunksAndVerify(chunkNames []string, hashValues []string, outputFil
 
 		// Verify the hash of the chunk
 		hashValue := fmt.Sprintf("%x", hasher.Sum(nil))
+
+		//check both hash values are same
 		if hashValue != hashValues[i] {
 			return fmt.Errorf("hash verification failed for chunk %s", chunkName)
 		}
