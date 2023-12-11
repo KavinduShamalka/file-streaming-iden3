@@ -12,6 +12,11 @@ import (
 	"github.com/iden3/go-merkletree-sql/db/memory"
 )
 
+// file structure
+type File struct {
+	owner string
+}
+
 func main() {
 
 	// Define chuksize 256kb in bytes
@@ -83,8 +88,20 @@ func checkProof(proofExist *merkletree.Proof, chunkNames []string, hashValues []
 
 	// check if proofExist true
 	if proofExist.Existence {
-		// RetrieveChunksfunctions
-		return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
+
+		// create instance of file
+		owner := File{
+			owner: "b",
+		}
+
+		// check valid owner
+		if owner.owner == "a" {
+
+			// RetrieveChunksfunctions
+			return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
+
+		}
+
 	}
 	return fmt.Errorf("proof of non-membership received")
 }
