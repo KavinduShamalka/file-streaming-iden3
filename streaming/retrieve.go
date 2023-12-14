@@ -8,7 +8,7 @@ import (
 )
 
 // Retrieve Chunks and Verify.
-func RetrieveChunksAndVerify(chunkNames []string, hashValues []string, outputFileName string) error {
+func RetrieveChunksAndVerify(chunkNames []string, outputFileName string) error {
 
 	// Create output file name
 	outputFile, err := os.Create(outputFileName)
@@ -50,7 +50,7 @@ func RetrieveChunksAndVerify(chunkNames []string, hashValues []string, outputFil
 		// hashValues[2] = "sithum"
 
 		//check both hash values are same
-		if hashValue != hashValues[i] {
+		if hashValue != chunkNames[i] {
 			return fmt.Errorf("hash verification failed for chunk %s", chunkName)
 		}
 

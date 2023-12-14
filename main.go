@@ -36,7 +36,7 @@ func main() {
 	defer inputFile.Close()
 
 	// Return the chukn name, and hash value from the SplitFile function.
-	chunkNames, hashValues, err := streaming.SplitFile(inputFile, chunkSize)
+	chunkNames, err := streaming.SplitFile(inputFile, chunkSize)
 	if err != nil {
 		fmt.Println("Error splitting and hashing file:", err)
 		return
@@ -66,7 +66,7 @@ func main() {
 		fmt.Printf("Proof of membership for chunk %d: %v\n", index, proofExist.Existence)
 
 		//Check the proof
-		err := checkProof(proofExist, chunkNames, hashValues, "restored_data.jpg")
+		err := checkProof(proofExist, chunkNames, "restored_data.png")
 		if err != nil {
 			fmt.Println("Error retrieving and verifying chunks:", err)
 			return
@@ -84,21 +84,22 @@ func main() {
 }
 
 // Check the chunk's proof of existence
-func checkProof(proofExist *merkletree.Proof, chunkNames []string, hashValues []string, outputFileName string) error {
+func checkProof(proofExist *merkletree.Proof, chunkNames []string, outputFileName string) error {
 
 	// check if proofExist true
 	if proofExist.Existence {
 
 		// create instance of file
 		owner := File{
-			owner: "b",
+			owner: "a",
 		}
 
 		// check valid owner
 		if owner.owner == "a" {
 
+			// fmt.Printf("Owner %v", owner.owner)
 			// RetrieveChunksfunctions
-			return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
+			return streaming.RetrieveChunksAndVerify(chunkNames, outputFileName)
 
 		}
 
