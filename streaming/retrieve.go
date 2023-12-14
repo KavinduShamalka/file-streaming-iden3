@@ -59,4 +59,5 @@ func RetrieveChunksAndVerify(chunkNames []string, hashValues []string, outputFil
 	}
 
 	return nil
+
 }

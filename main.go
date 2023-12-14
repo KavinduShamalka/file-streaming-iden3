@@ -95,11 +95,9 @@ func checkProof(proofExist *merkletree.Proof, chunkNames []string, hashValues []
 		}
 
 		// check valid owner
-		if owner.owner == "a" {
-
-			// RetrieveChunksfunctions
+		if owner.owner == "b" {
+			// RetrieveChunksfunctionsS
 			return streaming.RetrieveChunksAndVerify(chunkNames, hashValues, outputFileName)
-
 		}
 
 	}
